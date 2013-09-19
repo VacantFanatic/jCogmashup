@@ -1,0 +1,103 @@
+<!--<script type="text/javascript" src="jquery.js"></script>-->
+<script type="text/javascript" src="jquery-1.4.2.js"></script>
+<script>
+//variables
+var COGSERVER = '127.0.0.1:80'
+var APPSERVER = '127.0.0.1:8080'
+var gateway = 'http://'+ COGSERVER +'/cognos/cgi-bin/cognos.cgi';
+ 
+$.support.cors = true;
+$(document).ready(function(){
+ iframeResizePipe();
+});
+$(window).resize(iframeResizePipe);
+ 
+function fetch(){
+ $.ajax({
+   url: gateway +'?b_action=xts.run&m=portal/close.xts',
+   type: 'GET',
+   success: function(data) {
+                getReport();
+            },
+   error: function(xhr, status, e) {
+    alert(e);
+            }
+   
+ });
+}
+
+function getXMLData(p1){
+ var toRet = "<promptAnswers><promptValues><name>UID</name><values><item><SimplePValue><inclusive>true</inclusive><useValue>"+ p1 +"</useValue><displayValue>"+p1+"</displayValue></SimplePValue></item></values></promptValues></promptAnswers>";
+ return toRet;
+}
+
+function getReport(){ 
+ var id = getParam('report');
+ var uid = getParam('user');
+ var xmlParams = getXMLData(uid);
+ $("#loading").show();
+ $.ajax({
+            url: gateway + "/rds/reportData/report/"+id+"?fmt=HTML&async=OFF&xmlData="+xmlParams,
+            type: 'GET',
+            dataType: 'html',
+   processData: false,
+   cache:false,
+            success: function(data) {
+                $("#loading").hide();
+    $('#output1').html(data);
+            },
+   error: function(xhr, status, e) {
+    $("#loading").hide();
+    $('#output1').html("Unable to retrieve report: " + e);
+            }
+        });
+  
+}
+
+function getParam( name )
+      {
+        name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+        var regexS = "[\\?&]"+name+"=([^&#]*)";
+        var regex = new RegExp( regexS );
+        var results = regex.exec( window.location.href );
+        if( results == null )
+          return "";
+        else
+          return results[1];
+      }
+function iframeResizePipe()
+  {
+     // What's the page height?
+     var height = $(document.body).height();
+     // Going to 'pipe' the data to the parent through the helpframe..
+     var pipe = document.getElementById('helpframe');
+  
+ 
+     // Cachebuster a precaution here to stop browser caching interfering
+     pipe.src = 'http://APPSERVER/app_serv_helper.html?height='+height+'&cacheb='+Math.random();
+  }
+
+//function is not used
+function logout(){
+ $.ajax({
+   url: gateway +'?b_action=xts.run&m=portal/logoff.xts&h_CAM_action=logoff',
+   type: 'GET',
+   success: function(data) {
+   },
+   error: function(xhr, status, e) {
+    alert(e);
+   }
+  }); 
+} 
+</script>
+</head>
+<body onload='fetch()'>
+ <iframe id="helpframe" src='' height='0' width='0' frameborder='0'></iframe>
+ <div id="loading">
+  <p><img src="ajax-loader.gif" /></p>
+  <p> Please Wait</p>
+ </div>
+ <div id="output1"></div>
+ 
+</body>
+</html>
