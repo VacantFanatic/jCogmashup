@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+ 
+//AXG768 03/2013
+<head>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+<title>CBSA Cognos CMS Client Profile Test</title>
+<style>
+body{  margin:0px;   padding:0px; }
+#report{  width:100%; }
+</style>
+<!--<script type="text/javascript" src="jquery.js"></script>-->
+<script type="text/javascript" src="jquery-1.4.2.js"></script>
+<script>  
+function resizeIframe(height){    
+// "+60" is a general rule of thumb to allow for differences in    
+// IE & and FF height reporting, can be adjusted as required..    
+document.getElementById('report').height = parseInt(height)+60;  
+}     
+ 
+function setSrc(id, rep){ 
+var COGSERVER = '127.0.0.1:80/test'
+var url = "http://"+COGSERVER+"/cogserver.html?report="+rep+"&user="+id; 
+$('#report').attr('src', url);  
+}
+</script>
+</head>
+<body >
+<button onclick="setSrc('user1', 'i01D633286C0F428BA95CFB504EB5D5BC')">user1/report1</button>
+<button onclick="setSrc('user2', 'i01D633286C0F428BA95CFB504EB5D5BC')">user2/report1</button></br>
+<iframe id='report' frameborder='0'></iframe>
+</body>
+</html>
